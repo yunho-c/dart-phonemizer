@@ -1,0 +1,3 @@
+[submodule "references/phonemizer"]
+	path = references/phonemizer
+	url = https://github.com/bootphon/phonemizer
