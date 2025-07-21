@@ -26,7 +26,13 @@ class Phonemizer {
         .asFunction();
 
     // Initialize espeak
-    final result = _initialize(audioOutputSynchronous, 0, nullptr, 0);
+    final espeakDataPath = Platform.environment['ESPEAK_DATA_PATH'];
+    final pathPtr = espeakDataPath != null ? espeakDataPath.toNativeUtf8() : nullptr;
+    final result = _initialize(audioOutputSynchronous, 0, pathPtr, 0);
+    if (pathPtr != nullptr) {
+      calloc.free(pathPtr);
+    }
+
     if (result < 0) {
       throw Exception('Failed to initialize eSpeak-ng');
     }
@@ -76,7 +82,8 @@ class Phonemizer {
     final textPtr = calloc<Pointer<Utf8>>();
     textPtr.value = textUtf8;
 
-    int phonemeMode = (phonemeSeparator.codeUnitAt(0) << 8) | espeakPHONEMES_IPA;
+    // Always use '_' as the separator for espeak, we'll replace it later.
+    int phonemeMode = ('_'.codeUnitAt(0) << 8) | espeakPHONEMES_IPA;
     final textMode = espeakCHARS_UTF8;
 
     final phonemes = <String>[];
@@ -95,6 +102,9 @@ class Phonemizer {
     var result = phonemes.join(' ').trim();
     if (!withStress) {
       result = result.replaceAll(RegExp(r"[ˈˌ'-]+"), '');
+    }
+    if (phonemeSeparator != '_') {
+      result = result.replaceAll('_', phonemeSeparator);
     }
     return result;
   }
