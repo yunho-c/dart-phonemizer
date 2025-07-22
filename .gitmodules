@@ -1,3 +1,6 @@
 [submodule "references/phonemizer"]
 	path = references/phonemizer
 	url = https://github.com/bootphon/phonemizer
+[submodule "references/phonemoro"]
+	path = references/phonemoro
+	url = https://github.com/yunho-c/phonemoro
